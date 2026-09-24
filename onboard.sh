@@ -58,13 +58,20 @@ else
   MISSING=1
 fi
 
-if command -v python3 >/dev/null 2>&1; then
+if command -v python3 >/dev/null 2>&1 && python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 13) else 1)' 2>/dev/null; then
   ok "python3 found: $(python3 --version)"
 else
-  fail "python3 not found."
+  if command -v python3 >/dev/null 2>&1; then
+    fail "python3 found ($(python3 --version 2>&1)), but it's older than the 3.13+ the Smart Tests CLI needs."
+    echo "      This can happen even with a newer Python installed elsewhere (e.g. via Homebrew)"
+    echo "      if the older system python3 (/usr/bin/python3 on macOS) comes first on your PATH."
+  else
+    fail "python3 not found."
+  fi
   echo "      Why you need it: the Smart Tests CLI is distributed as a Python package"
-  echo "      (it's a generic, language-agnostic tool, not tied to your project's language)."
-  echo "      Install with:  brew install python3"
+  echo "      (it's a generic, language-agnostic tool, not tied to your project's language),"
+  echo "      and it specifically requires Python 3.13 or newer."
+  echo "      Install with:  brew install python3   (then make sure it comes first on PATH)"
   MISSING=1
 fi
 
