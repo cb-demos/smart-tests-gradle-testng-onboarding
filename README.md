@@ -51,22 +51,22 @@ Keep this private — treat it like a password. Don't paste it into Slack, commi
 
 ## 4. Getting the script itself
 
-You should have received `onboard.sh` as a direct file (Slack/email attachment) or from a repo link. Save it somewhere convenient, e.g. your home folder or Downloads.
+Clone this repo:
 
-**Important:** a file downloaded from Slack/browser usually does **not** keep its "runnable" permission — you need to set it yourself (one-time, see Step 5).
+```bash
+git clone https://github.com/cb-demos/smart-tests-gradle-testng-onboarding.git
+cd smart-tests-gradle-testng-onboarding
+```
 
 ---
 
 ## 5. Running it — step by step
 
 ```bash
-# 1. Navigate to where you saved the file
-cd ~/Downloads          # or wherever you saved onboard.sh
-
-# 2. Make it executable (one-time step)
+# 1. Make it executable (one-time step)
 chmod +x onboard.sh
 
-# 3. Run it
+# 2. Run it
 ./onboard.sh
 ```
 
