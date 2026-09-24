@@ -40,10 +40,10 @@ banner "Step 1 of 5: Checking prerequisites"
 
 MISSING=0
 
-if command -v java >/dev/null 2>&1; then
-  ok "Java found: $(java -version 2>&1 | head -1)"
+if command -v java >/dev/null 2>&1 && java -version >/dev/null 2>&1; then
+  ok "Java found: $(java -version 2>&1 | grep -m1 'version')"
 else
-  fail "Java not found."
+  fail "Java not found (or found but not actually working -- e.g. macOS ships a 'java' stub with no real JDK behind it)."
   echo "      Why you need it: your project itself needs a JVM to build and run,"
   echo "      and the Smart Tests CLI (below) also needs one internally."
   echo "      Install with:  brew install openjdk@17   (or your org's standard JDK)"
