@@ -126,16 +126,34 @@ cd "$PROJECT_DIR"
 banner "Step 3 of 5: Smart Tests CLI"
 # ---------------------------------------------------------------------------
 
+PINNED_CLI_VERSION="2.11.2"
 if command -v smart-tests >/dev/null 2>&1; then
-  ok "Smart Tests CLI already installed: $(smart-tests --version)"
+  INSTALLED_VERSION="$(smart-tests --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+  if [ "$INSTALLED_VERSION" = "$PINNED_CLI_VERSION" ]; then
+    ok "Smart Tests CLI already installed: $(smart-tests --version)"
+  else
+    warn "Smart Tests CLI installed, but version $INSTALLED_VERSION does not match the pinned version $PINNED_CLI_VERSION."
+    if confirm "  Reinstall to the pinned version $PINNED_CLI_VERSION now?"; then
+      python3 -m pip install --no-cache-dir "smart-tests-cli==$PINNED_CLI_VERSION" 2>/tmp/pip_err.log \
+        || python3 -m pip install --user --break-system-packages --no-cache-dir "smart-tests-cli==$PINNED_CLI_VERSION"
+      NEW_VERSION="$(smart-tests --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+      if [ "$NEW_VERSION" = "$PINNED_CLI_VERSION" ]; then
+        ok "Now installed: $(smart-tests --version)"
+      else
+        fail "Reinstall did not result in $PINNED_CLI_VERSION (still $NEW_VERSION). See /tmp/pip_err.log."
+      fi
+    else
+      warn "Continuing with $INSTALLED_VERSION -- behavior may differ from what was validated on $PINNED_CLI_VERSION."
+    fi
+  fi
 else
   warn "Smart Tests CLI not found."
-  if confirm "  Install it now (pip install smart-tests-cli)?"; then
-    python3 -m pip install --no-cache-dir "smart-tests-cli~=2.0" 2>/tmp/pip_err.log
+  if confirm "  Install it now (pip install smart-tests-cli==$PINNED_CLI_VERSION)?"; then
+    python3 -m pip install --no-cache-dir "smart-tests-cli==$PINNED_CLI_VERSION" 2>/tmp/pip_err.log
     if ! command -v smart-tests >/dev/null 2>&1; then
       warn "Standard install failed (likely a system-managed Python environment)."
-      if confirm "  Retry with 'pip install --user'?"; then
-        python3 -m pip install --user --no-cache-dir "smart-tests-cli~=2.0"
+      if confirm "  Retry with 'pip install --user --break-system-packages'?"; then
+        python3 -m pip install --user --break-system-packages --no-cache-dir "smart-tests-cli==$PINNED_CLI_VERSION"
       fi
     fi
   fi
