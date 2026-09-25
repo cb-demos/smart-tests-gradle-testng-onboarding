@@ -16,5 +16,10 @@ dependencies {
 }
 
 test {
-    useTestNG()
+    useTestNG {
+        // Gradle does not discover TestNG listeners from META-INF/services,
+        // so the launchable-testng listener must be registered explicitly or
+        // Approach 2's subsetting silently never runs.
+        listeners << 'com.launchableinc.testng.TestSelector'
+    }
 }
